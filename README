@@ -4,21 +4,23 @@ Getting Started
 
 1. Install Scala and SBT
 
-2. In the directory where you would like to start your project, start up SBT
+2. Place the Scails JAR in ~/.sbt/plugins/lib/
 
-3. At the SBT prompt, create a scails project:
+3. In the directory where you would like to start your project, start up SBT
+
+4. At the SBT prompt, create a scails project:
 
 > scail myApp
 
 Where "myApp" is the name of the application.
 
-4. To see your application running, start the local Jetty server:
+5. To see your application running, start the local Jetty server:
 
 > jetty-run
 
 Then visit http://localhost:8080
 
-5. As features are developed, documentation will be created
+6. As features are developed, documentation will be created
 
 
 ===============
