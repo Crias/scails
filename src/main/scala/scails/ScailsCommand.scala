@@ -1,7 +1,8 @@
 import sbt._
 import Keys._
+import java.io.File
 import java.io.FileWriter
-object Scails extends Plugin {
+object ScailsCommand extends Plugin {
 
   val mvcImpl = new LiftApp
 
@@ -17,13 +18,19 @@ object Scails extends Plugin {
 
   def scailApplication(state : State, projectName : String) = {
     if(file("build.sbt").exists()) file("build.sbt").delete()
+
     mvcImpl.prepDirectories()
     writePlugins()
     writeProject(projectName)
+
+    IO.unzipStream(resourceStream("lift_2.4-M1.zip"), file("src/main"))
+
     setupCommands(projectName).foldLeft(state){(state : State, command : String) =>
       Command.process(command,state)
     }
   }
+
+  def resourceStream(name : String) = this.getClass().getClassLoader.getResourceAsStream(name)
 
   def writePlugins() {
     file("project/plugins").mkdirs
