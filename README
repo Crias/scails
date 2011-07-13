@@ -4,11 +4,13 @@ Getting Started
 
 1. Install Scala and SBT
 
-2. Place the Scails JAR in ~/.sbt/plugins/lib/
+2. Place the "scails.install" in the directory where you would like your project 
 
-3. In the directory where you would like to start your project, start up SBT
+3. Execute the installer and start SBT:
 
-4. At the SBT prompt, create a scails project:
+> sbt < scails.install && sbt
+
+4. Execute the "scails" command to create an application
 
 > scail myApp
 

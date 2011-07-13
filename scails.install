@@ -1,0 +1,6 @@
+reload plugins
+set libraryDependencies += "com.codequirks" %% "scails" % "0.1.0"
+set libraryDependencies += "org.apache.velocity" % "velocity" % "1.7"
+update
+session save
+reload return
