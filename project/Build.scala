@@ -69,8 +69,9 @@ object MyBuild extends Build {
 
 }
 
-  // The following code is a copy of the com.zentrope.ScalatePlugin version 1.3
-  // The plugin, as was, could not properly process a directory of my choosing
+// The following code is a copy of the com.zentrope.ScalatePlugin version 1.3
+// The plugin, as was, could not properly process a directory of my choosing
+// https://github.com/zentrope/xsbt-scalate-precompile-plugin
 object TemplateProcessor {
   import org.fusesource.scalate.TemplateSource
   import org.fusesource.scalate.TemplateEngine
@@ -129,85 +130,3 @@ object TemplateProcessor {
       }
     }
 }
-/*import sbt._
-
-object MyBuild extends Build
-{
-  lazy val root = Project("root", file("."), settings = Seq(
-    sbtPlugin := true
-
-    name := "Scails"
-
-    organization := "com.codequirks"
-
-    version := "0.1.0"
-
-    cleanFiles <<= (cleanFiles, baseDirectory) { 
-      (files, basedir) => 
-        files ++ Seq(new File(basedir, "/project/target"))
-    }
-
-    libraryDependencies ++= Seq(
-      "org.fusesource.scalate" % "scalate-core" % "1.4.1" % "compile",
-      "ch.qos.logback" %  "logback-classic" % "0.9.28" % "compile"
-    )
-
-    scalateTemplateDirectories in Compile <<= (scalateTemplateDirectories in Compile, baseDirectory) { (dirs, basedir) => 
-      def templateDirectories(dirName : String) : Seq[File] = {
-        val dir = file(dirName)
-        val thisDir = if(containsTemplate(dir)) Seq(file(dirName)) else Seq[File]()
-       dir.list().
-          filter{f => file(dirName + "/" + f).isDirectory}.
-          flatMap(f => templateDirectories(dirName + "/" + f)) ++
-          thisDir
-      }
-      def containsTemplate(dir : File) = {
-        val dirs = dir.list().filter { file => 
-          file.endsWith(".scaml") || 
-          file.endsWith(".jade") || 
-          file.endsWith(".ssp") ||
-          file.endsWith(".ms")
-        }
-        dirs.size > 0
-      }
-      dirs ++ Seq(file("src/main/templates"))
-    }
-
-    scalateSourceGeneratorTask <<= scalateSourceGeneratorTask apply { tasks => 
-        val taskKey = TaskKey[Unit]("prep-scalate")
-        val prepTask = taskKey := { processDirectory("src/main/resources") }
-      def processDirectory(dirName : String) {
-          val dir = file(dirName)
-          dir.list().foreach(println)
-          copyTemplates(dirName, dir)
-          dir.list().
-            filter{f => file(dirName + "/" + f).isDirectory}.
-            foreach(f => processDirectory(dirName + "/" + f))
-      }
-      def copyTemplates(dirName : String, dir : File) {
-        val propsFile = file(dirName + "/template.properties")
-        if(propsFile.exists) {
-          import java.util.Properties
-          import scala.collection.JavaConversions.asScalaSet
-          val props = new Properties
-          props.load(propsFile)
-          props.entrySet.foreach { entry =>
-            val (key,value) = (entry.getKey(), entry.getValue()) 
-            if(isTemplate(key)) {
-              val templateTarget = key.replace("/", "_")
-              IO.copyFile(file(dirName + "/" + key), file("src/main/templates/ " + templateTarget))
-            }
-          }
-        }
-      }
-        def isTemplate(key : String) = {
-          file.endsWith(".scaml") || 
-        file.endsWith(".jade") || 
-        file.endsWith(".ssp") ||
-        file.endsWith(".mousetache")
-      }
-      Seq(prepTask) ++ tasks
-    }      
-    )
-  )
-}*/
