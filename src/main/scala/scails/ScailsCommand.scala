@@ -1,14 +1,18 @@
 import sbt._
 import Keys._
-import java.io.StringWriter;
-import java.io.File
+import sbt.Load.LoadedPlugins
 import java.io.FileWriter
 import java.util.Properties
-import scala.collection.JavaConversions._
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity
+import scala.collection.JavaConversions.asScalaSet
+import org.fusesource.scalate.util._
+import org.fusesource.scalate.TemplateEngine
 
 object ScailsCommand extends Plugin {
+  val engine = new TemplateEngine()
+//  engine.resourceLoader = new FileResourceLoader {
+//    override def resource(uri: String): Option[Resource] =
+//      Some(Resource.fromText(uri, IO.readStream(resourceStream(uri))))
+//  }
 
   val mvcImpl = new LiftApp
 
@@ -23,13 +27,12 @@ object ScailsCommand extends Plugin {
     }
 
   def scailApplication(state : State, appName : String) = {
-    Velocity.setProperty("resource.loader", "class")
-    Velocity.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader")
-    Velocity.init()
-    val context = new VelocityContext()
-    context.put( "appName", appName)
-
     if(file("build.sbt").exists()) file("build.sbt").delete()
+
+      val extr = Project.extract(state)
+      val buildStruct = extr.structure
+      val plugins: LoadedPlugins = buildStruct.units(buildStruct.root).unit.plugins
+      engine.classpath = plugins.classpath.filter(_.getName.contains("scala-compiler")).mkString(":")
 
     mvcImpl.prepDirectories()
     writePlugins()
@@ -37,15 +40,12 @@ object ScailsCommand extends Plugin {
 
     val initFolder = "init/lift_2.4-M1/"
     readProps(initFolder+"template.properties").foreach { entry => 
-      val (key,value) = (entry.getKey(), entry.getValue()) 
+      val (key,value) = (entry.getKey().toString, entry.getValue()) 
+      val templateResource = initFolder.replace("/","_") + key.replace("/","_")
       if(value == null || "" == value.toString)
-        IO.transfer(resourceStream(initFolder + key), file(key.toString))
-      else {
-        val sw = new StringWriter
-        val template = Velocity.getTemplate(initFolder + key)
-        template.merge(context, sw)
-        IO.write(file(value.toString), sw.toString)
-      }
+        IO.transfer(resourceStream(initFolder + key), file(key))
+      else
+        IO.write(file(value.toString), engine.layout(templateResource, Map("appName" -> appName)))
     }
     readProps(initFolder+"directory.properties").foreach { entry => 
       file(entry.getKey.toString).mkdirs
@@ -53,6 +53,25 @@ object ScailsCommand extends Plugin {
 
     setupCommands(appName).foldLeft(state){(state : State, command : String) =>
       Command.process(command,state)
+    }
+  }
+
+  // The following method inspired by https://github.com/fhars/sbt-ensime-plugin
+  def getClasspath(state : State, cpTaskKey : TaskKey[Classpath]) {
+      val extr = Project.extract(state)
+      import extr._
+
+      val cpOpt : Option[Seq[Attributed[File]]] = 
+  Project.evaluateTask(cpTaskKey in (currentRef, Test), state) flatMap {
+    case Inc(_) => None
+    case Value(v) => Some(v)
+  }
+  for (cp <- cpOpt) {
+      val jars = cp.map(_.data).filter(f => f.exists && f.isFile)
+      def fmt(files: Seq[File]) = files.map("\"" + _ + "\"").reduceRight(_+" "+_)
+      if(jars != Nil)
+        println(cpTaskKey.key.label + " (" + fmt(jars) + ")")
+      else println(cpTaskKey.key.label + " is empty")
     }
   }
 
@@ -92,30 +111,32 @@ object ScailsCommand extends Plugin {
     "\n" +
     "seq(webSettings :_*)\n" + 
     "\n" +
-    "libraryDependencies += \"org.eclipse.jetty\" % \"jetty-webapp\" % \"7.3.0.v20110203\" % \"jetty\"\n" + 
+    "\n" +
+    "libraryDependencies += \"org.eclipse.jetty\" % \"jetty-webapp\" % \"7.3.0.v20110203\" % \"jetty\"\n\n" + 
+    "libraryDependencies += \"com.codequirks\" %% \"scails\" % \"0.1.0\"\n\n" + 
     mvcImpl.deps
 }
 
 trait MVC {
-  val deps : String
-  def prepDirectories() : Unit
+	val deps : String
+	def prepDirectories() : Unit
 }
 
 class LiftApp extends MVC {
 
 
   def prepDirectories() {
-    file("src/main/scala").mkdirs
-    file("src/main/resources").mkdirs
-    file("src/main/webapp").mkdirs
-    file("src/test/scala").mkdirs
+  	file("src/main/scala").mkdirs
+  	file("src/main/resources").mkdirs
+  	file("src/main/webapp").mkdirs
+  	file("src/test/scala").mkdirs
   }
 
   val deps : String = """
-  |libraryDependencies +=  "net.liftweb" %% "lift-webkit" % "2.4-M1" % "compile->default"
-  |
-  |libraryDependencies += "net.liftweb" %% "lift-mapper" % "2.4-M1" % "compile->default"
-  |
-  |libraryDependencies += "net.liftweb" %% "lift-wizard" % "2.4-M1" % "compile->default"
-  |""".stripMargin   
+	|libraryDependencies +=  "net.liftweb" %% "lift-webkit" % "2.4-M1" % "compile->default"
+	|
+	|libraryDependencies += "net.liftweb" %% "lift-mapper" % "2.4-M1" % "compile->default"
+	|
+	|libraryDependencies += "net.liftweb" %% "lift-wizard" % "2.4-M1" % "compile->default"
+	|""".stripMargin   
 }

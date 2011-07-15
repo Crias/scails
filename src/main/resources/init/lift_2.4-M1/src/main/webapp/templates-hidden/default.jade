@@ -1,0 +1,70 @@
+-@ val appName: String 
+html(xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/")
+  head
+    meta(http-equiv="content-type" content="text/xml; charset=UTF-8")
+    meta(name="keywords" content="")
+    meta(name="description" content="")
+    title(class="lift:Menu.title") #{appName}: 
+    style(class="lift:CSS.blueprint")
+    style(class="lift:CSS.fancyType")
+    script#jquery(src="/classpath/jquery.js" type="text/javascript")
+    script#json(src="/classpath/json.js" type="text/javascript")
+    :css
+      .edit_error_class {
+        display: block;
+        color: red;
+      }
+
+      .sidebar ul {
+        margin:0;
+        padding:0;
+        border-bottom:1px solid #ccc;
+      }
+
+      .sidebar ul li {
+        margin:0;
+        padding:0;
+        list-style:none;
+        border:1px solid #ccc;
+        border-bottom:none;
+      }
+
+      .sidebar ul li a {
+        display:block;
+        padding:3px;
+        text-indent:30px;
+        text-decoration:none;
+      }
+
+      .sidebar ul li span {
+        display:block;
+        padding:3px;
+        text-indent:30px;
+        text-decoration:none;
+      }
+
+      .sidebar ul li a:hover {
+        background-color: #eee;
+      }
+  body
+    div.container
+      div.column.span-12.last(style="text-align: center; width: 100%")
+        h1.alt>
+          | #{appName}
+          img#ajax-loader(alt="" style="display:none;margin-bottom:0px;margin-left:5px;" src="/images/ajax-loader.gif")
+      hr
+      div.column.span-6.colborder.sidebar
+        hr.space
+        span(class="lift:Menu.builder")
+        div(class="lift:Msgs?showAll=true")
+        hr.space
+      div.column.span-17.last
+        div#content
+          | The main content will get bound here
+      hr
+      div.column.span-23.last(style="text-align: center")
+        h4.alt
+          a(href="http://www.liftweb.net")
+            i Lift
+          | is copyrighted 2007-2011 Worldwide Conferencing, LLC.
+          | Distributed under an Apache 2.0 License
