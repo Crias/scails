@@ -39,14 +39,12 @@ class Boot {
     // where to search snippet
     LiftRules.addToPackages("code")
 
-    // Build SiteMap
-    def sitemap = SiteMap(
-      Menu.i("Home") / "index" >> User.AddUserMenusAfter, // the simple way to declare a menu
+    val preMenu = List(Menu.i("Home") / "index" >> User.AddUserMenusAfter)
+    val scaffoldMenu = LiftScaffoldMenu.menu
+    val postMenu = List(Menu.i("Static") / "static" / **)
 
-      // more complex because this menu allows anything in the
-      // /static path to be visible
-      Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
-	       "Static Content")))
+    // Build SiteMap
+    def sitemap = SiteMap.build((preMenu ++ scaffoldMenu ++ postMenu).toArray)
 
     def sitemapMutators = User.sitemapMutator
 
