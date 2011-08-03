@@ -19,33 +19,15 @@ import code.model._
  */
 class Boot {
   def boot {
-    if (!DB.jndiJdbcConnAvailable_?) {
-      val vendor = 
-	new StandardDBVendor(Props.get("db.driver") openOr "org.h2.Driver",
-			     Props.get("db.url") openOr 
-			     "jdbc:h2:lift_proto.db;AUTO_SERVER=TRUE",
-			     Props.get("db.user"), Props.get("db.password"))
-
-      LiftRules.unloadHooks.append(vendor.closeAllConnections_! _)
-
-      DB.defineConnectionManager(DefaultConnectionIdentifier, vendor)
-    }
-
-    // Use Lift's Mapper ORM to populate the database
-    // you don't need to use Mapper to use Lift... use
-    // any ORM you want
-    Schemifier.schemify(true, Schemifier.infoF _, User)
-
     // where to search snippet
     LiftRules.addToPackages("code")
 
     val preMenu = List(Menu.i("Home") / "index" >> User.AddUserMenusAfter)
-    val scaffoldMenu = LiftScaffoldMenu.menu
+    val scaffoldMenu = ScaffoldList.menu
     val postMenu = List(Menu.i("Static") / "static" / **)
 
     // Build SiteMap
     def sitemap = SiteMap.build((preMenu ++ scaffoldMenu ++ postMenu).toArray)
-
     def sitemapMutators = User.sitemapMutator
 
     // set the sitemap.  Note if you don't want access control for
@@ -73,7 +55,18 @@ class Boot {
     LiftRules.htmlProperties.default.set((r: Req) =>
       new Html5Properties(r.userAgent))    
 
-    // Make a transaction span the whole HTTP request
-    S.addAround(DB.buildLoanWrapper)
+    // Handle the Database
+    if (!DB.jndiJdbcConnAvailable_? && Props.require("db.driver", "db.url").isEmpty) {
+      val vendor = new StandardDBVendor(
+           Props.get("db.driver") openTheBox,
+           Props.get("db.url") openTheBox,
+           Props.get("db.user"), Props.get("db.password"))
+
+      LiftRules.unloadHooks.append(vendor.closeAllConnections_! _)
+      DB.defineConnectionManager(DefaultConnectionIdentifier, vendor)
+      Schemifier.schemify(true, Schemifier.infoF _, User)
+      ScaffoldList.modelList foreach { t => Schemifier.schemify(true, Schemifier.infoF _, t) }
+      S.addAround(DB.buildLoanWrapper)
+    }
   }
 }

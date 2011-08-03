@@ -44,16 +44,11 @@ object Lift {
   def init = ScailsCommandExecution(templates = List("init/lift_2.4-M1/"), commands = List("reload", "update"))
   def scaffold(properName : String) = ScailsCommandExecution(templates = List("scaffold/lift_2.4-M1/"), tasks = List(() => {
     val lowerName = properName.toLowerCase
-    val menuFile = "src/main/scala/bootstrap/liftweb/LiftScaffoldMenu.scala"
+    val menuFile = "src/main/scala/bootstrap/liftweb/ScaffoldList.scala"
     val menu = LiftMenuParser(IO.read(file(menuFile)))
     val newMenu = menu match {
-      case Some(v) => v.addMenuItem(properName, lowerName)
-      case None => SProgram(
-          SPackage("bootstrap.liftweb"),
-          List(SImport(List("net","liftweb","sitemap","_"))), 
-          SObject("LiftScaffoldMenu", 
-            SMenu("menu", 
-              List(SMenuItem(properName+"s", lowerName+"s")))))
+      case Some(v) => v.addScaffold(properName)
+      case None => throw new RuntimeException("No ScaffoldList.scala found. Please restore the file.")
     }
     IO.write(file(menuFile), newMenu.toString)
   }))
