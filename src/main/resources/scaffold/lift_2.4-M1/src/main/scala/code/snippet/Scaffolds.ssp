@@ -1,0 +1,43 @@
+<%@ var properName: String %>
+<%@ var lowerName: String %>
+<%@ var typeList: List[DataType] %>
+
+package code.snippet
+
+import net.liftweb.http._
+import net.liftweb.util._
+import Helpers._
+import code.model._
+
+object ${properName}s {
+
+  object Show${properName} extends RequestVar[Option[${properName}]](None)
+
+  def all = ".${lowerName} * " #> ${properName}.findAll.map(bind(_))
+  def show = ".${lowerName} * " #> Show${properName}.is.map(bind(_))
+
+  def bind(${lowerName} : ${properName}) = {  
+    #for (typeDef <- typeList)
+    ".${typeDef.lowerName} *" #> ${lowerName}.${typeDef.lowerName} &
+    #end
+    ".edit" #> SHtml.hrefFunc(()=>Edit${properName}.${lowerName}.set(${lowerName})) &
+    ".show" #> SHtml.hrefFunc(()=>Show${properName}.set(Some(${lowerName}))) &
+    ".delete" #> SHtml.hrefFunc(()=>${lowerName}.delete_!)
+  }
+}
+
+object New${properName} extends LiftScreen {
+  object ${lowerName} extends ScreenVar(${properName}.create)
+  addFields(() => ${lowerName}.is)
+  def finish() {
+    S.notice("saved " + ${lowerName}.is.save)
+  }
+}
+
+object Edit${properName} extends LiftScreen {
+  object ${lowerName} extends ScreenVar(${properName}.findOrCreate(S.param("id").getOrElse(-1)))
+  addFields(() => ${lowerName}.is)
+  def finish() {
+    S.notice("saved " + ${lowerName}.is.save)
+  }
+}

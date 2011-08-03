@@ -1,5 +1,6 @@
 import sbt._
 import Keys._
+import complete.DefaultParsers._
 
 object ScailsCommand extends Plugin {
   override lazy val settings = Seq(
@@ -8,45 +9,62 @@ object ScailsCommand extends Plugin {
 
   lazy val scailsMain = 
     Command.args("scail", "<appName>") { (state: State, args : Seq[String]) => val appName = args(0)
-      println("About to scale " + appName + "!")
-      scailApplication(state, appName)
+      startingDirectories.foreach(file(_).mkdirs)
+      execute(state, Lift.init, Map("appName" -> appName))
     }
 
+  lazy val scaffold = Space ~> token(ID.examples("<scaffoldName>")) ~ typeList
+  lazy val typeList = Space ~> token(rep1sep(field, Space))
+  lazy val field = ID.examples("<fieldName>") ~ typeDec map { t => DataType(t._1, t._2)}
+  lazy val typeDec = ":" ~> ("string" ^^^ "string")
   lazy val scaffoldMain = 
-    Command.args("scaffold", "<name>") { (state: State, args : Seq[String]) => val scaffoldName = args(0)
-      println("Scaffolding " + scaffoldName)
-      scaffold(state, scaffoldName)
+    Command("scaffold")(_ => scaffold){ (state, args) => val (scaffoldName, typeList) = (args._1, args._2)
+      val arguments = Map(
+        "properName" -> toProper(scaffoldName), 
+        "lowerName" -> scaffoldName.toLowerCase,
+        "typeList" -> typeList)
+      execute(state, Lift.scaffold(toProper(scaffoldName)), arguments)
     }
 
-  def scailApplication(state : State, appName : String) = {
-    file("src/main/scala").mkdirs
-    file("src/main/resources").mkdirs
-    file("src/main/webapp").mkdirs
-    file("src/test/scala").mkdirs
-
-    TemplateRunner.runTemplate("init/lift_2.4-M1/", Map("appName" -> appName))
-    setupCommands(appName).foldLeft(state){(state : State, command : String) =>
-      Command.process(command,state)
+  def execute(state : State, command : ScailsCommandExecution, templateArguments : Map[String,Any] = Map()) = {
+   command match { case ScailsCommandExecution(templates, tasks, commands) => 
+      templates.foreach { t =>
+        TemplateRunner.runTemplate(t, templateArguments)
+      }
+      tasks.foreach(_.apply())
+      commands.foldLeft(state) { (state:State, command:String) => Command.process(command, state) }
     }
   }
 
-  def scaffold(state : State, scaffoldName : String) = {
+  def toProper(name : String) = name.head.toUpper + name.tail
+  val startingDirectories = List("src/main/scala", "src/main/resources", "src/main/webapp")
+}
+
+object Lift {
+  def init = ScailsCommandExecution(templates = List("init/lift_2.4-M1/"), commands = List("reload", "update"))
+  def scaffold(properName : String) = ScailsCommandExecution(templates = List("scaffold/lift_2.4-M1/"), tasks = List(() => {
+    val lowerName = properName.toLowerCase
     val menuFile = "src/main/scala/bootstrap/liftweb/LiftScaffoldMenu.scala"
     val menu = LiftMenuParser(IO.read(file(menuFile)))
     val newMenu = menu match {
-      case Some(v) => v.addMenuItem(scaffoldName, scaffoldName)
+      case Some(v) => v.addMenuItem(properName, lowerName)
       case None => SProgram(
           SPackage("bootstrap.liftweb"),
           List(SImport(List("net","liftweb","sitemap","_"))), 
           SObject("LiftScaffoldMenu", 
             SMenu("menu", 
-              List(SMenuItem(scaffoldName, scaffoldName)))))
+              List(SMenuItem(properName+"s", lowerName+"s")))))
     }
     IO.write(file(menuFile), newMenu.toString)
-    state
-  }
-
-  def setupCommands(appName:String)  : List[String] = 
-    "reload" :: 
-    "update" :: Nil
+  }))
 }
+
+case class DataType(name : String, typeInfo : String) {
+  val properName = name.head.toUpper + name.tail
+  val lowerName = name.toLowerCase
+}
+
+case class ScailsCommandExecution(
+  templates : List[String] = List[String](), 
+  tasks : List[Function0[Unit]] = List(()=>{}), 
+  commands : List[String] = List[String]())

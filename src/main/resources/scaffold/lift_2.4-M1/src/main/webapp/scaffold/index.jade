@@ -1,0 +1,29 @@
+-@ val properName: String 
+-@ val lowerName: String 
+-@ val typeList: List[DataType]
+html(xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/")
+  head
+    meta(http-equiv="content-type" content="text/xml; charset=UTF-8")
+    title #{properName}s - Index
+  body(class="lift:content_id=main")
+    div#main(class="lift:surround?with=default;at=content")
+      h2 Posts
+      p
+        table(class="lift:#{lowerName}s.all")
+          tr
+            - for(typeDec <- typeList)
+              th #{typeDec.properName}
+            th
+            th
+            th
+          tr(class="#{lowerName}")
+            - for(typeDec <- typeList)
+              td(class="#{typeDec.lowerName}") #{typeDec.properName}
+            td
+              a.show(href="/#{lowerName}s/show") Show
+            td
+              a.edit(href="/#{lowerName}s/edit") Edit
+            td
+              a.delete(href="#" onclick="if(!confirm('Are you sure?')) return false;") Delete
+        p
+          a(href="/#{lowerName}s/new") New #{properName}  

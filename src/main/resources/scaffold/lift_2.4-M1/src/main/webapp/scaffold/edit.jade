@@ -1,0 +1,10 @@
+-@ val properName: String 
+-@ val lowerName: String 
+html(xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/")
+  head
+    meta(http-equiv="content-type" content="text/xml; charset=UTF-8")
+    title #{properName}s - Edit
+  body(class="lift:content_id=main")
+    div#main(class="lift:surround?with=default;at=content")
+      h2 Posts
+      div(class="lift:Edit#{properName}") Put your form here

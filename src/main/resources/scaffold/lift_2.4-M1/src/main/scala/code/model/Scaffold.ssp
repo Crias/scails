@@ -1,0 +1,16 @@
+<%@ var properName: String %>
+<%@ var lowerName: String %>
+<%@ var typeList: List[DataType] %>
+
+package code.model
+import net.liftweb.mapper._
+
+class ${properName} extends LongKeyedMapper[${properName}] with IdPK {
+  def getSingleton = ${properName}
+
+  #for (typeDef <- typeList)
+  object ${typeDef.lowerName} extends MappedString(this, 150)
+  #end
+}
+
+object ${properName} extends ${properName} with LongKeyedMetaMapper[${properName}]
