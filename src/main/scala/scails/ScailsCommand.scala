@@ -15,14 +15,22 @@ object ScailsCommand extends Plugin {
 
   lazy val scaffold = Space ~> token(ID.examples("<scaffoldName>")) ~ typeList
   lazy val typeList = Space ~> token(rep1sep(field, Space))
-  lazy val field = ID.examples("<fieldName>") ~ typeDec map { t => DataType(t._1, t._2)}
-  lazy val typeDec = ":" ~> ("string" ^^^ "string")
+  lazy val field = ID.examples("<fieldName>") ~ typeDec map { t => FieldDefinition(t._1, t._2)}
+  lazy val typeDec = ":" ~> (
+    "string" ^^^ StringData | 
+    "text" ^^^ TextData |
+    "bool" ^^^ BooleanData |
+    "date" ^^^ DateData |
+    "time" ^^^ TimeData |
+    "double" ^^^ DoubleData |
+    "int" ^^^ IntData |
+    "long" ^^^ LongData)
   lazy val scaffoldMain = 
     Command("scaffold")(_ => scaffold){ (state, args) => val (scaffoldName, typeList) = (args._1, args._2)
       val arguments = Map(
         "properName" -> toProper(scaffoldName), 
         "lowerName" -> scaffoldName.toLowerCase,
-        "typeList" -> typeList)
+        "fieldList" -> typeList)
       execute(state, Lift.scaffold(toProper(scaffoldName)), arguments)
     }
 
@@ -54,10 +62,20 @@ object Lift {
   }))
 }
 
-case class DataType(name : String, typeInfo : String) {
+case class FieldDefinition(name : String, typeInfo : DataType) {
   val properName = name.head.toUpper + name.tail
   val lowerName = name.toLowerCase
 }
+
+sealed trait DataType
+case object StringData extends DataType
+case object TextData extends DataType
+case object BooleanData extends DataType
+case object DateData extends DataType
+case object TimeData extends DataType
+case object DoubleData extends DataType
+case object IntData extends DataType
+case object LongData extends DataType
 
 case class ScailsCommandExecution(
   templates : List[String] = List[String](), 

@@ -1,6 +1,6 @@
 <%@ var properName: String %>
 <%@ var lowerName: String %>
-<%@ var typeList: List[DataType] %>
+<%@ var fieldList: List[FieldDefinition] %>
 
 package code.snippet
 
@@ -17,7 +17,7 @@ object ${properName}s {
   def show = ".${lowerName} * " #> Show${properName}.is.map(bind(_))
 
   def bind(${lowerName} : ${properName}) = {  
-    #for (typeDef <- typeList)
+    #for (typeDef <- fieldList)
     ".${typeDef.lowerName} *" #> ${lowerName}.${typeDef.lowerName} &
     #end
     ".edit" #> SHtml.hrefFunc(()=>Edit${properName}.${lowerName}.set(${lowerName})) &

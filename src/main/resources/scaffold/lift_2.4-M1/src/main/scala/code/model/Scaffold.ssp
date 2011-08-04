@@ -1,6 +1,6 @@
 <%@ var properName: String %>
 <%@ var lowerName: String %>
-<%@ var typeList: List[DataType] %>
+<%@ var fieldList: List[FieldDefinition] %>
 
 package code.model
 import net.liftweb.mapper._
@@ -8,8 +8,18 @@ import net.liftweb.mapper._
 class ${properName} extends LongKeyedMapper[${properName}] with IdPK {
   def getSingleton = ${properName}
 
-  #for (typeDef <- typeList)
-  object ${typeDef.lowerName} extends MappedString(this, 150)
+  #for (fieldDef <- fieldList)
+    <% val mappedObject = fieldDef.typeInfo match {
+      case StringData => "MappedString(this, 150)"
+      case TextData => "MappedText(this)"
+      case BooleanData => "MappedBoolean(this)"
+      case DateData => "MappedDate(this)"
+      case TimeData => "MappedDateTime(this)"
+      case DoubleData => "MappedDouble(this)"
+      case IntData => "MappedInt(this)"
+      case LongData => "MappedLong(this)"
+    } %>
+  object ${fieldDef.lowerName} extends ${mappedObject}
   #end
 }
 
