@@ -11,7 +11,7 @@ class ${properName} extends LongKeyedMapper[${properName}] with IdPK {
   #for (fieldDef <- fieldList)
     <% val mappedObject = fieldDef.typeInfo match {
       case StringData => "MappedString(this, 150)"
-      case TextData => "MappedText(this)"
+      case TextData => "MappedTextarea(this, 2048)"
       case BooleanData => "MappedBoolean(this)"
       case DateData => "MappedDate(this)"
       case TimeData => "MappedDateTime(this)"
@@ -23,4 +23,8 @@ class ${properName} extends LongKeyedMapper[${properName}] with IdPK {
   #end
 }
 
-object ${properName} extends ${properName} with LongKeyedMetaMapper[${properName}]
+object ${properName} extends ${properName} with LongKeyedMetaMapper[${properName}] {
+   override def fieldOrder = List(
+     ${fieldList.map(_.lowerName).mkString(",")}
+   )
+}
