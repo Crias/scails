@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+        <appender class="ch.qos.logback.core.helpers.NOPAppender" name="RootAppender"/>
+        <root>
+                <level value="warn"/>
+                <appender-ref ref="RootAppender"/>
+        </root>
+</configuration>

@@ -3,6 +3,6 @@ resolvers ++= Seq (
 )
 
 libraryDependencies ++= Seq (
-    "com.zentrope" %% "xsbt-scalate-precompile-plugin" % "1.2"
+    "com.zentrope" %% "xsbt-scalate-precompile-plugin" % "1.4"
 )
 
