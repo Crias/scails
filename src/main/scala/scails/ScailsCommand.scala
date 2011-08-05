@@ -21,7 +21,7 @@ object ScailsCommand extends Plugin {
     "text" ^^^ TextData |
     "bool" ^^^ BooleanData |
     "date" ^^^ DateData |
-    "time" ^^^ TimeData |
+    "datetime" ^^^ DateTimeData |
     "double" ^^^ DoubleData |
     "int" ^^^ IntData |
     "long" ^^^ LongData)
@@ -72,7 +72,7 @@ case object StringData extends DataType
 case object TextData extends DataType
 case object BooleanData extends DataType
 case object DateData extends DataType
-case object TimeData extends DataType
+case object DateTimeData extends DataType
 case object DoubleData extends DataType
 case object IntData extends DataType
 case object LongData extends DataType

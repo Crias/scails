@@ -7,8 +7,10 @@ html(xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/")
     title(class="lift:Menu.title") #{appName}: 
     style(class="lift:CSS.blueprint")
     style(class="lift:CSS.fancyType")
+    link(rel="stylesheet" type="text/css" href="/calendrical.css")
     script#jquery(src="/classpath/jquery.js" type="text/javascript")
     script#json(src="/classpath/json.js" type="text/javascript")
+    script#calendrical(src="/jquery.calendrical.js" type="text/javascript")
     :css
       .edit_error_class {
         display: block;

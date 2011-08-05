@@ -4,6 +4,7 @@
 
 package code.model
 import net.liftweb.mapper._
+import code.lib._
 
 class ${properName} extends LongKeyedMapper[${properName}] with IdPK {
   def getSingleton = ${properName}
@@ -14,7 +15,7 @@ class ${properName} extends LongKeyedMapper[${properName}] with IdPK {
       case TextData => "MappedTextarea(this, 2048)"
       case BooleanData => "MappedBoolean(this)"
       case DateData => "MappedDate(this)"
-      case TimeData => "MappedDateTime(this)"
+      case DateTimeData => "JQueryDateTime(this)"
       case DoubleData => "MappedDouble(this)"
       case IntData => "MappedInt(this)"
       case LongData => "MappedLong(this)"
