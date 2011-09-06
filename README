@@ -8,21 +8,34 @@ Getting Started
 
 3. Execute the installer and start SBT:
 
-> sbt < scails.install && sbt
+	$ sbt < scails.install && sbt
 
 4. Execute the "scails" command to create an application
 
-> scail myApp
+	> scail myApp
 
 Where "myApp" is the name of the application.
 
 5. To see your application running, start the local Jetty server:
 
-> jetty-run
+	> jetty-run
 
 Then visit http://localhost:8080
 
 6. As features are developed, documentation will be created
+
+
+===============
+DEVELOPMENT
+===============
+
+Those who would like to further develop Scails should consult the DEVELOPMENT file.
+
+DEVELOPMENT will detail current priorities, gotches, and practices for developing
+the project.
+
+It will also include instructions to get you going.
+ 
 
 
 ===============
