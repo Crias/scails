@@ -1,0 +1,75 @@
+=====================
+INTRODUCTION
+=====================
+
+The Scails application is intended to be a tool for rapid application creation.
+
+The Scails lifecycle is discussed more thoroughly in other documentation. By keeping 
+this lifecycle in mind we can create an excellent tool for starting projects, and 
+allow the natural strengths of other frameworks to pick up where we left off.
+
+----------------------
+
+Instructions will be presented in step-form, accompanied by examples of commands.
+During these command examples, two different prompts will be used:
+    $ This is a command-prompt at your standard *NIX shell
+    > This is a prompt at the SBT REPL
+
+
+=====================
+DEVELOPMENT
+=====================
+
+The following are assumed before starting this section:
+ - SBT 0.10.0 is on the path as "sbt"
+ - Scails has been cloned into $DEV_HOME
+
+1. Publish a local copy of the plugin
+    $ cd $DEV_HOME
+    $ sbt clean publish-local
+
+2. Install the plugin to a test project
+    $ rm -rf /tmp/testProject
+    $ mkdir -p /tmp/testProject
+    $ cd /tmp/testProject
+    $ sbt < $DEV_HOME/scails.install
+    $ sbt
+    > scail testProject
+
+3. Test any other Scails commands desired (ie: scaffold, etc.) as per 
+the normal Scails documentation.
+
+Any modifications to the Scails source can be followed by a repitition 
+of these steps.
+
+
+=====================
+TESTING
+=====================
+
+It is the current belief of the developers of this project that 100% automated 
+test coverage is the only reasonable goal for a project.
+
+In that goal Scails has failed miserably. Currently the automated coverage is at 0%.
+
+
+The reason for this is that the primary priority of Scails is not that the code generation 
+work flawlessly, but that the code generated work as expected. This is difficult to test 
+in an automated fashion.
+
+
+The current testing goals of the project are:
+ - Wrap tests around current code, aiming for 100% coverage
+ - Find a way to reasonably test the behaviour of generated code
+
+The tests for the generated code should, hopefully, be written in such a way that plugin 
+developers hoping to add new frameworks to Scails can run the tests against their plugin 
+to ensure compliance. Ideas as to how to accomplish this are always welcome.
+
+
+
+
+
+
+
+
