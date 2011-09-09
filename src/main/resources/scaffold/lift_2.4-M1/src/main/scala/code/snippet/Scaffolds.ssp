@@ -20,22 +20,14 @@ object ${properName}s {
     #for (typeDef <- fieldList)
     ".${typeDef.lowerName} *" #> ${lowerName}.${typeDef.lowerName} &
     #end
-    ".edit" #> SHtml.hrefFunc(()=>Edit${properName}.${lowerName}.set(${lowerName})) &
-    ".show" #> SHtml.hrefFunc(()=>Show${properName}.set(Some(${lowerName}))) &
-    ".delete" #> SHtml.hrefFunc(()=>${lowerName}.delete_!)
+    ".edit#{properName}" #> SHtml.hrefFunc(()=>${properName}Form.${lowerName}.set(${lowerName})) &
+    ".show#{properName}" #> SHtml.hrefFunc(()=>Show${properName}.set(Some(${lowerName}))) &
+    ".delete#{properName}" #> SHtml.hrefFunc(()=>${lowerName}.delete_!)
   }
 }
 
-object New${properName} extends LiftScreen {
+object ${properName}Form extends LiftScreen {
   object ${lowerName} extends ScreenVar(${properName}.create)
-  addFields(() => ${lowerName}.is)
-  def finish() {
-    S.notice("saved " + ${lowerName}.is.save)
-  }
-}
-
-object Edit${properName} extends LiftScreen {
-  object ${lowerName} extends ScreenVar(${properName}.findOrCreate(S.param("id").getOrElse(-1)))
   addFields(() => ${lowerName}.is)
   def finish() {
     S.notice("saved " + ${lowerName}.is.save)

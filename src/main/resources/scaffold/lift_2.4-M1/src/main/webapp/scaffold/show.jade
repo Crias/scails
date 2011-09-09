@@ -7,9 +7,9 @@ html(xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/")
     title #{properName}s - Show
   body(class="lift:content_id=main")
     div#main(class="lift:surround?with=default;at=content")
-      h2 Posts
-      p
-        table(class="lift:#{lowerName}s.show")
+      h2 #{properName}s
+      div(class="lift:#{lowerName}s.show")
+        table
           tbody(class="#{lowerName}")
             - for(typeDec <- fieldList)
               tr
