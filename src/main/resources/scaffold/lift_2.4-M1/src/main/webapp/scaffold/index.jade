@@ -20,10 +20,10 @@ html(xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/")
             - for(typeDec <- fieldList)
               td(class="#{typeDec.lowerName}") #{typeDec.properName}
             td
-              a.show#{properName}(href="/#{lowerName}s/show") Show
+              a(class="show#{properName}" href="/#{lowerName}s/show") Show
             td
-              a.edit#{properName}(href="/#{lowerName}s/edit") Edit
+              a(class="edit#{properName}" href="/#{lowerName}s/edit") Edit
             td
-              a.delete#{properName}(href="#" onclick="if(!confirm('Are you sure?')) return false;") Delete
+              a(class="delete#{properName}" href="#" onclick="if(!confirm('Are you sure?')) return false;") Delete
         p
           a(href="/#{lowerName}s/new") New #{properName}  
