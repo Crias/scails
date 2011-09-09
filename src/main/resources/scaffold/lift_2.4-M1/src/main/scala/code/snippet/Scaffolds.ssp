@@ -20,9 +20,9 @@ object ${properName}s {
     #for (typeDef <- fieldList)
     ".${typeDef.lowerName} *" #> ${lowerName}.${typeDef.lowerName} &
     #end
-    ".edit#{properName}" #> SHtml.hrefFunc(()=>${properName}Form.${lowerName}.set(${lowerName})) &
-    ".show#{properName}" #> SHtml.hrefFunc(()=>Show${properName}.set(Some(${lowerName}))) &
-    ".delete#{properName}" #> SHtml.hrefFunc(()=>${lowerName}.delete_!)
+    ".edit${properName}" #> SHtml.hrefFunc(()=>${properName}Form.${lowerName}.set(${lowerName})) &
+    ".show${properName}" #> SHtml.hrefFunc(()=>Show${properName}.set(Some(${lowerName}))) &
+    ".delete${properName}" #> SHtml.hrefFunc(()=>${lowerName}.delete_!)
   }
 }
 
