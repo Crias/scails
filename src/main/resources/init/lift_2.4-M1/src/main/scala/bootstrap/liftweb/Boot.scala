@@ -22,17 +22,12 @@ class Boot {
     // where to search snippet
     LiftRules.addToPackages("code")
 
-    val preMenu = List(Menu.i("Home") / "index" >> User.AddUserMenusAfter)
+    val preMenu = List(Menu.i("Home") / "index")
     val scaffoldMenu = ScaffoldList.menu
     val postMenu = List(Menu.i("Static") / "static" / **)
 
     // Build SiteMap
-    def sitemap = SiteMap.build((preMenu ++ scaffoldMenu ++ postMenu).toArray)
-    def sitemapMutators = User.sitemapMutator
-
-    // set the sitemap.  Note if you don't want access control for
-    // each page, just comment this line out.
-    LiftRules.setSiteMapFunc(() => sitemapMutators(sitemap))
+    LiftRules.setSiteMap(SiteMap.build((preMenu ++ scaffoldMenu ++ postMenu).toArray))
 
     // Use jQuery 1.4
     LiftRules.jsArtifacts = net.liftweb.http.js.jquery.JQuery14Artifacts
@@ -55,9 +50,6 @@ class Boot {
     // Force the request to be UTF-8
     LiftRules.early.append(_.setCharacterEncoding("UTF-8"))
 
-    // What is the function to test if a user is logged in?
-    LiftRules.loggedInTest = Full(() => User.loggedIn_?)
-
     // Use HTML5 for rendering
     LiftRules.htmlProperties.default.set((r: Req) =>
       new Html5Properties(r.userAgent))    
@@ -71,7 +63,6 @@ class Boot {
 
       LiftRules.unloadHooks.append(vendor.closeAllConnections_! _)
       DB.defineConnectionManager(DefaultConnectionIdentifier, vendor)
-      Schemifier.schemify(true, Schemifier.infoF _, User)
       ScaffoldList.modelList foreach { t => Schemifier.schemify(true, Schemifier.infoF _, t) }
       S.addAround(DB.buildLoanWrapper)
     }
