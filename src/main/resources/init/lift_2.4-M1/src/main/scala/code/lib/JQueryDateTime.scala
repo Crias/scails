@@ -14,7 +14,7 @@ abstract class JQueryDateTime[T<:Mapper[T]](fieldOwner: T) extends MappedDateTim
   override def parse(s : String) : Box[Date] = try {
     Full(dateTimeFormatter.parse(s))
   } catch {
-    case _ : Empty
+    case _ => Empty
   }
   override def format(d: Date): String = dateTimeFormatter.format(d)
 
