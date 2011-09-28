@@ -11,7 +11,11 @@ abstract class JQueryDateTime[T<:Mapper[T]](fieldOwner: T) extends MappedDateTim
   val dateFormatter = new SimpleDateFormat("d/M/yy")
   val timeFormatter = new SimpleDateFormat("k:mm")
 
-  override def parse(s : String) : Box[Date] = Full(dateTimeFormatter.parse(s))
+  override def parse(s : String) : Box[Date] = try {
+    Full(dateTimeFormatter.parse(s))
+  } catch {
+    case _ : Empty
+  }
   override def format(d: Date): String = dateTimeFormatter.format(d)
 
   override def _toForm: Box[NodeSeq] = 
