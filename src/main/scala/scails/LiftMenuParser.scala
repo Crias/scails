@@ -7,8 +7,8 @@ object LiftMenuParser extends StandardTokenParsers {
   override val lexical : StdLexical = new StdLexical {
     override def whitespaceChar = elem("space char", ch => ch <= ' ' && ch != '\n' && ch != EofCh)
   }
-  lexical.reserved ++= List("package", "import", "object", "class", "val", "List", "BaseMetaMapper", "Menu", "i")
-  lexical.delimiters ++= List("[", "]", ".","\n","{", "}", "(", ")", "=", ";", ",", "/", "**")
+  lexical.reserved ++= List("package", "import", "object", "class", "val", "List", "BaseMetaMapper", "Menu", "i", "Loc", "Hidden")
+  lexical.delimiters ++= List("[", "]", ".","\n","{", "}", "(", ")", "=", ";", ",", "/", "**", ">>")
 
   def eos = ("\n" | ";")
 
@@ -35,12 +35,18 @@ object LiftMenuParser extends StandardTokenParsers {
   lazy val `menuThenTypes` = `menuDef` ~ `typeListDef` ^^ { case m~t => (m,t) }
   lazy val `typesThenMenu` = `typeListDef` ~ `menuDef` ^^ { case t~m => (m,t) }
 
-  lazy val `menuDef` = rep("\n") ~ "val" ~> ident ~ "=" ~ "List" ~ "(" ~ repsep(`menuItem`, ",") <~ ")" ^^ {
+  lazy val `menuDef` = rep("\n") ~ "val" ~> ident ~ "=" ~ "List" ~ "(" ~ repsep(`menuItem` , ",") <~ ")" ^^ {
     case id~_~_~_~items => new SMenu(id, items)
   }
 
-  lazy val `menuItem` = rep("\n") ~ "Menu" ~ "." ~ "i" ~ "(" ~> stringLit ~ ")" ~ "/" ~ stringLit <~ "/" ~ "**" ~ rep("\n") ^^ {
-    case link~_~_~loc => SMenuItem(link, loc)
+  lazy val `menuItem` = (`hiddenMenuItem` | `normalMenuItem`) ^^ { case mI => mI }
+  
+  lazy val `normalMenuItem` = rep("\n") ~ "Menu" ~ "." ~ "i" ~ "(" ~> stringLit ~ ")" ~ "/" ~ stringLit <~ "/" ~ "**" ~ rep("\n") ^^ {
+    case link~_~_~loc => SMenuItem(link, loc, false)
+  }
+
+  lazy val `hiddenMenuItem` = rep("\n") ~ "Menu" ~ "." ~ "i" ~ "(" ~> stringLit ~ ")" ~ "/" ~ stringLit <~ "/" ~ "**" ~ ">>" ~ "Loc" ~ "." ~ "Hidden" ~ rep("\n") ^^ {
+    case link~_~_~loc => SMenuItem(link, loc, true)
   }
 
   lazy val `typeListDef` = rep("\n") ~ "val" ~> ident ~ "=" ~ "List"  ~ "[" ~ "BaseMetaMapper" ~ "]" ~ "(" ~ repsep(`typeListItem`, ",") <~ ")" ^^ {
@@ -79,10 +85,10 @@ case class SObject(name : String, menu : SMenu, typeList : SList) extends Expr {
 }
 case class SMenu(name : String, menuItems : List[SMenuItem]) extends Expr {
   override def toString = "  val " + name + " = List(\n" + menuItems.mkString(",\n") + ")"
-  def addMenuItem(name : String, loc : String) = SMenu(this.name, menuItems :+ SMenuItem(name, loc))
+  def addMenuItem(name : String, loc : String) = SMenu(this.name, menuItems :+ SMenuItem(name, loc, false))
 }
-case class SMenuItem(link : String, loc : String) extends Expr {
-  override def toString = "    Menu.i(\""+link+"\") / \"" + loc + "\" / **"
+case class SMenuItem(link : String, loc : String, hidden : Boolean) extends Expr {
+  override def toString = "    Menu.i(\""+link+"\") / \"" + loc + "\" / **" + (if(hidden) " >> Loc.Hidden" else "")
 }
 case class SList(name : String, items : List[SListItem]) extends Expr {
   override def toString = "  val " + name + " = List[BaseMetaMapper](\n" + items.mkString(",\n") + ")"
