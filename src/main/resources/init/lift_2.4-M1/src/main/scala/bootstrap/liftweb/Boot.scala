@@ -41,6 +41,13 @@ class Boot {
     LiftRules.ajaxStart =
       Full(() => LiftRules.jsArtifacts.show("ajax-loader").cmd)
     
+    // Fadeout for Notices, not Errors
+    LiftRules.noticesAutoFadeOut.default.set( (notices: NoticeType.Value) => {
+      notices match {
+        case NoticeType.Notice => Full((2 seconds, 2 seconds))
+        case _ => Empty
+      }}) 
+      
     // Make the spinny image go away when it ends
     LiftRules.ajaxEnd =
       Full(() => LiftRules.jsArtifacts.hide("ajax-loader").cmd)

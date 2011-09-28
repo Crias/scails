@@ -48,7 +48,38 @@ html(xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/")
       .sidebar ul li a:hover {
         background-color: #eee;
       }
+      
+      #lift__noticesContainer___notice, #lift__noticesContainer___warning, #lift__noticesContainer___error {
+        width: 200px;
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        -moz-border-radius: 15px;
+        border-radius: 15px;
+        padding: 10px;
+        margin: 5px;
+      }
+
+      #lift__noticesContainer__ ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+      }
+
+      #lift__noticesContainer___notice {
+        background-color: green;
+      }
+
+      #lift__noticesContainer___warning {
+        background-color: yellow;
+      }
+
+      #lift__noticesContainer___error {
+        background-color: red;
+      }
+      
   body
+    div(class="lift:Msgs?showAll=true")
     div.container
       div.column.span-12.last(style="text-align: center; width: 100%")
         h1.alt>
@@ -58,7 +89,6 @@ html(xmlns="http://www.w3.org/1999/xhtml" xmlns:lift="http://liftweb.net/")
       div.column.span-6.colborder.sidebar
         hr.space
         span(class="lift:Menu.builder")
-        div(class="lift:Msgs?showAll=true")
         hr.space
       div.column.span-17.last
         div#content
