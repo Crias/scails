@@ -7,10 +7,21 @@ object ScailsCommand extends Plugin {
     commands ++= Seq(scailsMain, scaffoldMain)
   )
 
+  def initCommands(appName: String) = List(
+      "set name := \""+ appName +"\"",
+      """set libraryDependencies += "org.eclipse.jetty" % "jetty-webapp" % "7.3.0.v20110203" % "jetty" """,
+      """set libraryDependencies += "net.liftweb" %% "lift-webkit" % "2.4-M1" % "compile->default" """,
+      """set libraryDependencies += "net.liftweb" %% "lift-mapper" % "2.4-M1" % "compile->default" """,
+      """set libraryDependencies += "net.liftweb" %% "lift-wizard" % "2.4-M1" % "compile->default" """,
+      "session save",
+      "reload"
+    )
+
   lazy val scailsMain = 
     Command.args("scail", "<appName>") { (state: State, args : Seq[String]) => val appName = args(0)
+      val newState = initCommands(appName).foldLeft(state)(processCommands)
       startingDirectories.foreach(file(_).mkdirs)
-      execute(state, Lift.init, Map("appName" -> appName))
+      execute(newState, Lift.init, Map("appName" -> appName))
     }
 
   lazy val scaffold = Space ~> token(ID.examples("<scaffoldName>")) ~ typeList
@@ -40,12 +51,13 @@ object ScailsCommand extends Plugin {
         TemplateRunner.runTemplate(t, templateArguments)
       }
       tasks.foreach(_.apply())
-      commands.foldLeft(state) { (state:State, command:String) => Command.process(command, state) }
+      commands.foldLeft(state)(processCommands)
     }
   }
 
   def toProper(name : String) = name.head.toUpper + name.tail
   val startingDirectories = List("src/main/scala", "src/main/resources", "src/main/webapp")
+  val processCommands = (state:State, command:String) => Command.process(command,state)
 }
 
 object Lift {
