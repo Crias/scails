@@ -65,11 +65,3 @@ The current testing goals of the project are:
 The tests for the generated code should, hopefully, be written in such a way that plugin 
 developers hoping to add new frameworks to Scails can run the tests against their plugin 
 to ensure compliance. Ideas as to how to accomplish this are always welcome.
-
-
-
-
-
-
-
-Test.
